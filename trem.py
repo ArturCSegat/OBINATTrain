@@ -7,30 +7,38 @@ for _ in range(V):
     g[row[1]].append((row[0], row[2]))
 
 
-def DFS(start: int, end: int, cost=0, vis=None) -> int:
-    if vis is None:
-        vis = []
-    
-    if start == end and len(vis) > 2:
-        return cost
+def DFS(start, end, train_len, occupied=None, cost=0, last=0) -> int:
+    removed = []
+    if occupied is None:
+        occupied = []
 
-    if start in vis:
+    if cost >= train_len:
+        removed.append(occupied.pop(0))
+
+    if start in occupied:
+        for r in removed:
+            occupied.insert(0, r)
         return -1
 
-    vis.append(start)
+    if start == end and last != 0:
+        return cost
+
+    occupied.append(start)
 
     for (node, cost_to) in g[start]:
-        r = DFS(node, end, cost+cost_to, vis)
+        if node == last:
+            continue
+        r = DFS(node, end, train_len, occupied, cost+cost_to, last=start)
         if r != -1:
-            return r 
+            return r
         
-    vis.pop()
+    occupied.pop()
+    for r in removed:
+        occupied.insert(0, r)
+    
     return -1
-
-print()
-print()
 
 for _ in range(int(input())):
     row = [int(x) for x in input().split()]
-    print(DFS(row[0], row[0]))
+    print(DFS(row[0], row[0], row[1]))
 
